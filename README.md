@@ -1,17 +1,26 @@
-# 各种GAN的实验
-> 作者： 周孩\
-> 机构： 北京邮电大学\
-> 联系方式：1583124882@qq.com 
+# GANs
+> Author： Hai Zhou\
+> Institution： Beijing University of Posts and Telecommunication\
+> mail：1583124882@qq.com 
 
-用各种gan的模型来跑实验。
+Run experiments with various GAN model
 
-## 模型
-* [DCGAN](https://arxiv.org/abs/1511.06434)
+## Model
+### [DCGAN](https://arxiv.org/abs/1511.06434)
 
-## 数据集
-* 30000张人脸数据集，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
+<img src="Image/DCGAN/dcgan.png" width="500" align=center/>
 
-## 环境准备
+Architecture guidelines for stable DCGAN
+* Replace any pooling layers with strided convolutions(discriminator) and fractional-strided convolutions(generator).
+* Use batchnorm in both the generator and the discriminator.
+* Remove fully connected hihdden layers for deeper architectures.
+* Use ReLU activation in generator for all layers except for the output, which uses Tanh.
+* Use LeakyReLU activation in the discriminator for all layers.
+
+## Dataset
+* A dataset of 30,000 face，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
+
+## Configuration Environment
 ```
 conda create -n zh python=3.9
 conda activate zh
@@ -19,27 +28,26 @@ python3 -m pip install --upgrade pip
 pip3 install -r requirements.txt
 ```
 
-## 运行
-本次实验使用显卡 3*3090。若要修改显卡个数，可以修改 *--proc_per_node=<显卡个数>*
+## Run
 * DCGAN
 ```
 torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300
 ```
 
-## 实验结果
-* 真实样本
+## Experimental results
+* real example
 
 <img src="Image/real.png" alt="真是样本" width="500" align=center />
 
 ### DCGAN
-* 训练过程(每10个epoch一帧)
+* training process(10epoch/fps)
 
 <img src="Image/DCGAN/train_epoch.gif" width="500" align=center />
 
-* 较好的一张
+* good result
 
 <img src="Image/DCGAN/fake.png" width="500" align=center/>
 
 
-**注意：** 继续训练更多的轮次应该会有更好的结果，但是受到金钱的限制，
-此次训练到300轮就结束。
+**Notice:** *Continuing to train for more epochs should give better results, but is limited by money,
+The training ends after 300 rounds.*
