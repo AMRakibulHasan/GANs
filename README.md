@@ -29,9 +29,10 @@ pip3 install -r requirements.txt
 ```
 
 ## Run
+if your dataset path is *./dataset/data/*
 * DCGAN
 ```
-torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300
+torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300 --data_path dataset/data/
 ```
 
 ## Experimental results
