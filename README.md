@@ -29,15 +29,16 @@ torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300
 ## 实验结果
 * 真实样本
 
-![真实样本](Image/real_0.png)
+<img src="Image/real_0.png" alt="真是样本" width="300" align=center />
 
 ### DCGAN
 * 训练过程
 
-![训练过程](Image/DCGAN/train_epoch.gif)
+<img src="Image/DCGAN/train_epoch.gif" width="300" align=center />
+
 * 较好的一张
 
-![dcgan](Image/DCGAN/fake_224.png)
+<img src="Image/DCGAN/fake_224.png" width="300" align=center/>
 
 
 **注意：** 继续训练更多的轮次应该会有更好的结果，但是受到金钱的限制，
