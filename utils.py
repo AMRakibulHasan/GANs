@@ -30,5 +30,6 @@ def compose_gif(path):
     imageio.mimsave(os.path.join(path, 'train_epoch.gif'), gif_images, fps=3)
     print("保存成功...")
 
+
 if __name__ == "__main__":
     compose_gif('results/CelebA/')
