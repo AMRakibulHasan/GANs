@@ -9,10 +9,14 @@ import time
 class DCGAN(BaseTrainer):
     def __init__(self, args):
         super(DCGAN, self).__init__(args)
+        if self.rank == 0:
+            print("训练dcgan...")
 
     def _init_model(self):
-        self.gen = Generator(self.args.nz, self.args.ngf).cuda()
-        self.dis = Discriminator(self.args.ndf).cuda()
+        self.gen = Generator(self.args.nz, self.args.ngf)
+        self.gen = nn.SyncBatchNorm.convert_sync_batchnorm(self.gen).cuda()
+        self.dis = Discriminator(self.args.ndf)
+        self.dis = nn.SyncBatchNorm.convert_sync_batchnorm(self.dis).cuda()
         self.gen.apply(weights_init)
         self.dis.apply(weights_init)
         self.gen = nn.parallel.DistributedDataParallel(self.gen, device_ids=[self.rank], output_device=self.rank)
@@ -25,6 +29,7 @@ class DCGAN(BaseTrainer):
         # Loss  maximize log(D(x)) + log(1-D(G(z)))
         patten = "[%02d/%02d][%02d/%02d]  Loss_D: %.4f  Loss_G: %.4f  D(x): %.4f  D(G(x)): %.4f"
         for epoch in range(self.args.epochs):
+            self.sampler.set_epoch(epoch)
             cur_inputs = None
             for batch, inputs in enumerate(self.dl, 0):
                 self.gen_opt.zero_grad()

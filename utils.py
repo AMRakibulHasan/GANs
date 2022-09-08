@@ -32,4 +32,6 @@ def compose_gif(path):
 
 
 if __name__ == "__main__":
-    compose_gif('results/CelebA/')
+    DCGAN_img = 'results/CelebA/DCGAN/'
+    wgan_img = 'results/CelebA/wgan/'
+    compose_gif(wgan_img)
