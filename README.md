@@ -24,7 +24,7 @@ Since GAN[^1] was born, it has been difficult to train. WGAN fundamentally solve
 * After each update of the discriminator parameters truncate their absolute values to no more than a fixed constant c.
 * Replace Adam optimizer with RMSProp.
 
-**notice⚠️️:** *The RMSProp optimizer is used in the original wgan, the batch_size is set to 64, and the training is 600,000 epochs. I have limited funds, set the batch_size to 500, use the Adam optimizer, and train 300epochs.*
+**notice⚠️️:** *The batch_size is set to 64, and the training is 600,000 epochs in the original wgan. I have limited funds, so I set the batch_size to 500, and train 250epochs.*
 
 ## Dataset
 * A dataset of 30,000 face，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
