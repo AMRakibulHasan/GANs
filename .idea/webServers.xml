@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ebd4585d-7c63-4823-bf98-0c1c3603cd23" name="小泰坦">
+        <fileTransfer rootFolder="/mnt/sdb/zh" accessType="SFTP" host="10.112.250.80" port="22" sshConfigId="68d8ea2d-0671-431e-96ec-8f3fbbe6f9fc" sshConfig="zh@10.112.250.80:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -15,6 +15,8 @@ class BaseTrainer:
         safe_create_dir('results/CelebA')
         safe_create_dir('results/CelebA/%s' % self.args.model)
         safe_create_dir('results/CelebA/%s/Img' % self.args.model)
+        safe_create_dir('results/CelebA/%s/Img/fake/' % self.args.model)
+        safe_create_dir('results/CelebA/%s/Img/real/' % self.args.model)
         self.save_path = 'results/CelebA/%s/' % self.args.model
         self.rank = torch.distributed.get_rank()
         self.start = time.time()
@@ -66,8 +68,8 @@ class BaseTrainer:
         """
         self.gen.eval()
         noise = torch.randn((100, self.args.nz, 1, 1)).cuda()
-        save_image((imgs[:100] * 0.5) + 0.5, self.save_path + 'Img/real_%d.png' % epoch, nrow=10, padding=True)
+        save_image((imgs[:100] * 0.5) + 0.5, self.save_path + 'Img/real/real_%d.png' % epoch, nrow=10, padding=True)
         fake_x = self.gen(noise)
-        save_image((fake_x[:100] * 0.5) + 0.5, self.save_path + 'Img/fake_%d.png' % epoch, nrow=10, padding=True)
+        save_image((fake_x[:100] * 0.5) + 0.5, self.save_path + 'Img/fake/fake_%d.png' % epoch, nrow=10, padding=True)
 
         self.gen.train()

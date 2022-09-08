@@ -55,20 +55,10 @@ torchrun --nproc_per_node=3 run.py --lr 5e-5 --log_steps 10 --model wgan --epoch
 <img src="Image/real.png" alt="真是样本" width="500" align=center />
 
 ### DCGAN
-* training process(10epoch/fps)
-
-<img src="Image/DCGAN/train_epoch.gif" width="500" align=center />
-
-* good result
 
 <img src="Image/DCGAN/fake.png" width="500" align=center/>
 
 ### WGAN
-* training process(10epoch/fps)
-
-<img src="Image/wgan/train_epoch.gif" width="500" align=center />
-
-* good result
 
 <img src="Image/wgan/fake.png" width="500" align=center/>
 

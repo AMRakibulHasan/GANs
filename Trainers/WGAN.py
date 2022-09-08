@@ -34,6 +34,7 @@ class WGAN(BaseTrainer):
             self.sampler.set_epoch(epoch)
             cur_inputs = None
             for batch, inputs in enumerate(self.dl, 0):
+                # print('************* batch %d  *************' % batch)
                 self.gen_opt.zero_grad()
                 self.dis_opt.zero_grad()
                 cur_inputs = inputs.clone()
@@ -42,15 +43,20 @@ class WGAN(BaseTrainer):
                 inputs = inputs.cuda()
                 # print(next(self.dis.parameters()).device)
                 real_s = self.dis(inputs)
-                real_label = torch.ones_like(real_s).cuda()
+
+                # real_label = torch.ones_like(real_s).cuda()
                 # errD_real = self.cri(real_s, real_label)
                 # real_s.backward()
-                D_x = real_s.mean().item()
+                # D_x = real_s.mean().item()
                 noise = torch.randn((b, self.args.nz, 1, 1)).cuda()
                 fake_x = self.gen(noise)
+                (-real_s).mean().backward(retain_graph=True)
                 fake_s = self.dis(fake_x.detach())
+                fake_s.mean().backward(retain_graph=True)
+                # real_s.mean().backward(retain_graph=True)
                 errD = (fake_s - real_s).mean()
-                errD.backward()
+                # errD = (real_s - fake_s).mean()
+                # errD.backward(retain_graph=True)
                 self.dis_opt.step()
                 for param in self.dis.parameters():
                     torch.clip_(param.data, -self.args.c, self.args.c)
