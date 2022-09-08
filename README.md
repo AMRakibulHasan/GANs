@@ -74,7 +74,7 @@ torchrun --nproc_per_node=3 run.py --lr 5e-5 --log_steps 10 --model wgan --epoch
 
 
 **Notice:** *Continuing to train for more epochs should give better results, but is limited by money,
-The training ends after 300 rounds.*
+The training ends after 250 rounds.*
 
 # References
 * [WGAN Bolg](https://zhuanlan.zhihu.com/p/25071913) 
