@@ -39,18 +39,26 @@ class BaseTrainer:
     def save_model(self):
         self.gen.cpu()
         self.dis.cpu()
-        torch.save(self.gen.state_dict(), self.save_path + 'gen.pt')
-        torch.save(self.dis.state_dict(), self.save_path + 'dis.pt')
+        gen = {'net': self.gen.state_dict(),
+               'opt': self.gen_opt.state_dict()}
+        dis = {'net': self.dis.state_dict(),
+               'opt': self.dis_opt.state_dict()}
+        torch.save(gen, self.save_path + 'gen.pt')
+        torch.save(dis, self.save_path + 'dis.pt')
         self.gen.cuda()
         self.dis.cuda()
 
     def load_model(self):
-        self.gen.load_state_dict(torch.load(self.save_path + 'gen.pt'))
+        gen = torch.load(self.save_path + 'gen.pt')
+        dis = torch.load(self.save_path + 'dis.pt')
+        self.gen.load_state_dict(gen['net'])
         self.gen.cuda()
+        self.gen_opt.load_state_dict(gen['opt'])
         self.gen = torch.nn.parallel.DistributedDataParallel(self.gen, device_ids=[self.rank], output_device=self.rank)
 
-        self.dis.load_state_dict(torch.load(self.save_path + 'dis.pt'))
+        self.dis.load_state_dict(dis['net'])
         self.dis.cuda()
+        self.dis_opt.load_state_dict(dis['opt'])
         self.dis = torch.nn.parallel.DistributedDataParallel(self.dis, device_ids=[self.rank], output_device=self.rank)
 
     def train(self):
@@ -67,9 +75,9 @@ class BaseTrainer:
         :return:
         """
         self.gen.eval()
-        noise = torch.randn((100, self.args.nz, 1, 1)).cuda()
-        save_image((imgs[:100] * 0.5) + 0.5, self.save_path + 'Img/real/real_%d.png' % epoch, nrow=10, padding=True)
+        noise = torch.randn((64, self.args.nz, 1, 1)).cuda()
+        save_image((imgs[:64] * 0.5) + 0.5, self.save_path + 'Img/real/real_%d.png' % epoch, nrow=8, padding=True)
         fake_x = self.gen(noise)
-        save_image((fake_x[:100] * 0.5) + 0.5, self.save_path + 'Img/fake/fake_%d.png' % epoch, nrow=10, padding=True)
+        save_image((fake_x[:64] * 0.5) + 0.5, self.save_path + 'Img/fake/fake_%d.png' % epoch, nrow=8, padding=True)
 
         self.gen.train()

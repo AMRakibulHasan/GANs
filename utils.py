@@ -12,7 +12,7 @@ def safe_create_dir(path):
 
 def weights_init(m):
     classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
+    if classname.find('Conv2') != -1:
         nn.init.normal_(m.weight.data, 0.0, 0.02)
 
     elif classname.find('BatchNorm') != -1:

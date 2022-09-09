@@ -16,5 +16,6 @@ class DL:
                              num_workers=args.num_workers,
                              batch_size=args.batch_size,
                              sampler=self.sampler,
+                             drop_last=True,
                              )
 

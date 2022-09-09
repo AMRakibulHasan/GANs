@@ -8,7 +8,7 @@ Run experiments with various GAN model
 ## Model
 ### [DCGAN](https://arxiv.org/abs/1511.06434)
 
-<img src="Image/DCGAN/dcgan.png" width="500" align=center/>
+<p align="center"><img src="Image/DCGAN/dcgan.png" width="500" /></p>
 
 Architecture guidelines for stable DCGAN
 * Replace any pooling layers with strided convolutions(discriminator) and fractional-strided convolutions(generator).
@@ -24,7 +24,12 @@ Since GAN[^1] was born, it has been difficult to train. WGAN fundamentally solve
 * After each update of the discriminator parameters truncate their absolute values to no more than a fixed constant c.
 * Replace Adam optimizer with RMSProp.
 
-**notice⚠️️:** *The batch_size is set to 64, and the training is 600,000 epochs in the original wgan. I have limited funds, so I set the batch_size to 500, and train 250epochs.*
+### [SAGAN](https://arxiv.org/abs/1805.08318v2)
+<p align="center"><img src="Image/SAGAN/sagan.png" width=500"></p>
+The author proposes to use Self-Attention Generative Adversarial Network (SAGAN) for image generation tasks. In order to ensure the stability of model training, the author proposes
+
+* apply spectral normalization to the GAN generator and as well as in the discriminator. 
+* confirm that the twotimescale update rule (TTUR).
 
 ## Dataset
 * A dataset of 30,000 face，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
@@ -40,27 +45,34 @@ pip3 install -r requirements.txt
 ## Run
 if your dataset path is *./dataset/data/*
 * DCGAN
-```
+```bash
 torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300 --data_path dataset/data/
 ```
 
 * WGAN
-```
+```bash
 torchrun --nproc_per_node=3 run.py --lr 5e-5 --log_steps 10 --model wgan --epochs 300 --data_path dataset/data/
+```
+
+* SAGAN
+```bash
+torchrun --nproc_per_node=3 run.py --log_steps 10 --model sagan --epochs 1000 --batch_size 64
 ```
 
 ## Experimental results
 * real example
 
-<img src="Image/real.png" alt="真是样本" width="500" align=center />
+<p align="center"><img src="Image/real.png" alt="真是样本" width="500" align=center /></p>
 
 ### DCGAN
 
-<img src="Image/DCGAN/fake.png" width="500" align=center/>
+<p align="center"><img src="Image/DCGAN/fake.png" width="500" align=center/></p>
 
 ### WGAN
 
-<img src="Image/wgan/fake.png" width="500" align=center/>
+<p align="center"><img src="Image/wgan/fake.png" width="500"/></p>
+
+### SAGAN
 
 
 **Notice:** *Continuing to train for more epochs should give better results, but is limited by money,
