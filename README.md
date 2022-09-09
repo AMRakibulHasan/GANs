@@ -60,6 +60,8 @@ torchrun --nproc_per_node=3 run.py --log_steps 10 --model sagan --epochs 1000 --
 ```
 
 ## Experimental results
+You can enjoy the results in `./results`.
+
 * real example
 
 <p align="center"><img src="Image/real.png" alt="真是样本" width="500" align=center /></p>
