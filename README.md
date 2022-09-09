@@ -6,6 +6,11 @@
 Run experiments with various GAN model
 
 ## Model
+We compare the following models:
+* [DCGAN](https://arxiv.org/abs/1511.06434)
+* [WGAN](https://arxiv.org/abs/1701.07875)
+* [SAGAN](https://arxiv.org/abs/1805.08318v2)
+
 ### [DCGAN](https://arxiv.org/abs/1511.06434)
 
 <p align="center"><img src="Image/DCGAN/dcgan.png" width="500" /></p>
