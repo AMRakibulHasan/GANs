@@ -4,6 +4,8 @@ from dataset.dataLoader import DL
 from utils import safe_create_dir
 from torchvision.utils import save_image
 import time
+import os
+from tqdm import tqdm
 
 
 class BaseTrainer:
@@ -81,3 +83,20 @@ class BaseTrainer:
         save_image((fake_x[:64] * 0.5) + 0.5, self.save_path + 'Img/fake/fake_%d.png' % epoch, nrow=8, padding=True)
 
         self.gen.train()
+
+    @torch.no_grad()
+    def test(self):
+        self.load_model()
+        self.gen.eval()
+        safe_create_dir(os.path.join(self.save_path, 'Img', 'test_fake'))
+        safe_create_dir(os.path.join(self.save_path, 'Img', 'test_real'))
+        fake_path = os.path.join(self.save_path, 'Img', 'test_fake')
+        real_path = os.path.join(self.save_path, 'Img', 'test_real')
+        for batch, inputs in enumerate(tqdm(self.dl, ncols=100), 0):
+            b = inputs.shape[0]
+            inputs = inputs.cuda()
+            noise_z = torch.randn((b, self.args.nz, 1, 1)).cuda()
+            fake_x = self.gen(noise_z)
+            save_image((inputs[:64] * 0.5) + 0.5, os.path.join(real_path, '%s.png' % batch))
+            save_image((fake_x[:64] * 0.5) + 0.5, os.path.join(fake_path, '%s.png' % batch))
+

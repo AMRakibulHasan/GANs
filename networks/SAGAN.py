@@ -2,6 +2,20 @@ import torch.nn as nn
 from torch.nn.utils import spectral_norm
 import torch
 import torch.nn.functional as F
+from utils import SpectralNorm
+
+
+class SpectralNormConv(nn.Module):
+    def __init__(self, in_dim, out_dim, kernel_size, stride, padding, transpose, bias):
+        super(SpectralNormConv, self).__init__()
+        self.conv = nn.Identity()
+        if transpose:
+            self.conv = SpectralNorm(nn.ConvTranspose2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias))
+        else:
+            self.conv = SpectralNorm(nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias))
+
+    def forward(self, x):
+        return self.conv(x)
 
 
 class ConvBlock(nn.Module):
@@ -16,20 +30,25 @@ class ConvBlock(nn.Module):
             ac = nn.LeakyReLU(0.1, inplace=True)
         elif activate == 'tanh':
             ac = nn.Tanh()
-        if transpose:
-            self.net = nn.Sequential(
-                spectral_norm(nn.ConvTranspose2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias)),
-                # nn.ConvTranspose2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias),
-                bn,
-                ac,
-            )
-        else:
-            self.net = nn.Sequential(
-                spectral_norm(nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias)),
-                # nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias),
-                bn,
-                ac,
-            )
+        self.net = nn.Sequential(
+            SpectralNormConv(in_dim, out_dim, kernel_size, stride, padding, transpose, bias),
+            bn,
+            ac,
+        )
+        # if transpose:
+        #     self.net = nn.Sequential(
+        #         spectral_norm(nn.ConvTranspose2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias)),
+        #         # nn.ConvTranspose2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias),
+        #         bn,
+        #         ac,
+        #     )
+        # else:
+        #     self.net = nn.Sequential(
+        #         spectral_norm(nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias)),
+        #         # nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=bias),
+        #         bn,
+        #         ac,
+        #     )
 
     def forward(self, x):
         return self.net(x)
@@ -52,7 +71,7 @@ class Attn(nn.Module):
         attn_matrix = q @ k  # (b, n, n)
         attention = self.sf(attn_matrix)  # (b, n, n)
         out = v @ attention.permute(0, 2, 1)  # (b, c, n)
-        out = out.view(b, -1, w, h)   # (b, c, w, h)
+        out = out.view(b, -1, w, h)  # (b, c, w, h)
         out = self.gamma * out + x
         return out, attention
 
@@ -109,4 +128,4 @@ class Discriminator(nn.Module):
         x = self.block4(x)
         x, attention2 = self.attn2(x)
         x = self.block5(x)
-        return x.squeeze()
+        return F.sigmoid(x.squeeze())

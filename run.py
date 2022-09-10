@@ -21,7 +21,7 @@ parse.add_argument('--log_steps', type=int, help="多少batch打印一次日志"
 # parse.add_argument('--save_strategy', type=str, choices=['step', 'epoch'], default='epoch')
 
 parse.add_argument('--c', type=float, help="wgan的参数clip值", default=0.01)
-
+parse.add_argument('--mode', type=str, choices=['test', 'train'], default='train')
 parse.add_argument('--model', type=str, choices=['dcgan', 'wgan', 'sagan'], default='dcgan')
 parse.add_argument('--num_workers', type=int, help="dataloader的参数", default=4)
 parse.add_argument('--img_size', type=int, help="图片大小", default=64)
@@ -40,5 +40,7 @@ if __name__ == "__main__":
         trainer = WGAN(args)
     elif args.model == 'sagan':
         trainer = SAGAN(args)
-
-    trainer.train()
+    if args.mode == 'train':
+        trainer.train()
+    if args.mode == 'test':
+        trainer.test()

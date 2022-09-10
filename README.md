@@ -51,12 +51,12 @@ pip3 install -r requirements.txt
 if your dataset path is *./dataset/data/*
 * DCGAN
 ```bash
-torchrun --nproc_per_node=3 run.py --log_steps 10 --model dcgan --epochs 300 --data_path dataset/data/
+torchrun --nproc_per_node=1 run.py --log_steps 10 --model dcgan --epochs 300 --batch_size 64
 ```
 
 * WGAN
 ```bash
-torchrun --nproc_per_node=3 run.py --lr 5e-5 --log_steps 10 --model wgan --epochs 300 --data_path dataset/data/
+torchrun --nproc_per_node=1 run.py --log_steps 10 --model wgan --epochs 300 --lr 5e-5 --batch_size 64
 ```
 
 * SAGAN
@@ -81,6 +81,13 @@ You can enjoy the results in `./results`.
 
 ### SAGAN
 
+
+### Evaluate
+| Model |  Fid  |
+|:-----:|:-----:|
+| DCGAN | 24.86 |
+| WGAN  | 25.63 |
+| SAGAN |       |
 
 **Notice:** *Continuing to train for more epochs should give better results, but is limited by money,
 The training ends after 250 rounds.*
