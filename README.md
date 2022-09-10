@@ -7,9 +7,10 @@ Run experiments with various GAN model
 
 ## Model
 We compare the following models:
-* [DCGAN](https://arxiv.org/abs/1511.06434)
-* [WGAN](https://arxiv.org/abs/1701.07875)
-* [SAGAN](https://arxiv.org/abs/1805.08318v2)
+* [x] [DCGAN](https://arxiv.org/abs/1511.06434)
+* [x] [WGAN](https://arxiv.org/abs/1701.07875)
+* [x] [SAGAN](https://arxiv.org/abs/1805.08318v2)
+* [ ] [TransGAN](https://arxiv.org/abs/2102.07074)
 
 ### [DCGAN](https://arxiv.org/abs/1511.06434)
 
@@ -112,3 +113,4 @@ You can enjoy the results in `./results`.
 * [WGAN Bolg](https://zhuanlan.zhihu.com/p/25071913) 
 * [WGAN](https://arxiv.org/abs/1701.07875)
 * [pytorch](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html?highlight=dcgan)
+* [SAGAN](https://arxiv.org/abs/1805.08318v2)
