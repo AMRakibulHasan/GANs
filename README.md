@@ -48,20 +48,36 @@ pip3 install -r requirements.txt
 ```
 
 ## Run
-if your dataset path is *./dataset/data/*
+if your image dataset path is *../MyData/cv/CelebA/image/*
 * DCGAN
 ```bash
-torchrun --nproc_per_node=1 run.py --log_steps 10 --model dcgan --epochs 300 --batch_size 64
+torchrun --nproc_per_node=1 run.py \
+--log_steps 10 \
+--model dcgan \
+--epochs 300 \
+--batch_size 64 \
+--data_path ../MyData/cv/CelebA/image/
 ```
 
 * WGAN
 ```bash
-torchrun --nproc_per_node=1 run.py --log_steps 10 --model wgan --epochs 300 --lr 5e-5 --batch_size 64
+torchrun --nproc_per_node=1 run.py \
+--log_steps 10 \
+--model wgan \
+--epochs 300 \
+--lr 5e-5 \
+--batch_size 64 \
+--data_path ../MyData/cv/CelebA/image/
 ```
 
 * SAGAN
 ```bash
-torchrun --nproc_per_node=3 run.py --log_steps 10 --model sagan --epochs 1000 --batch_size 64
+torchrun --nproc_per_node=3 run.py \
+--log_steps 10 \
+--model sagan \
+--epochs 1000 \
+--batch_size 64 \
+--data_path ../MyData/cv/CelebA/image/
 ```
 
 ## Experimental results
@@ -81,16 +97,16 @@ You can enjoy the results in `./results`.
 
 ### SAGAN
 
+<p align="center"><img src="Image/SAGAN/fake.png" width="500"></p>
 
 ### Evaluate
-| Model |  Fid  |
-|:-----:|:-----:|
-| DCGAN | 24.86 |
-| WGAN  | 25.63 |
-| SAGAN |       |
+| Model |  Fid  | Time Cost |
+|:-----:|:-----:|:---------:|
+| DCGAN | 24.86 |   6h6m    |
+| WGAN  |       |           |
+| SAGAN | 25.63 |   7h46m   |
 
-**Notice:** *Continuing to train for more epochs should give better results, but is limited by money,
-The training ends after 250 rounds.*
+**Notice:** *The above are the results of running 300 epochs in NVIDIA TITAN Xp (**1x**)*.
 
 # References
 * [WGAN Bolg](https://zhuanlan.zhihu.com/p/25071913) 
