@@ -128,4 +128,4 @@ class Discriminator(nn.Module):
         x = self.block4(x)
         x, attention2 = self.attn2(x)
         x = self.block5(x)
-        return F.sigmoid(x.squeeze())
+        return x.squeeze()

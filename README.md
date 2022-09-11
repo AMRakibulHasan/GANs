@@ -88,6 +88,25 @@ torchrun --nproc_per_node=3 run.py \
 --data_path ../MyData/cv/CelebA/image/
 ```
 
+### How to test my model?
+Before testing the model, please copy `gen.pt` and `dis.pt` in `./results` to the corresponding location in `./models` after training. Or you can directly download the model [here](https://drive.google.com/drive/folders/13OtGRV41ICQs4oxIsp-J9fxRfCoNsy_V?usp=sharing) and put it in the corresponding location of `./models`, such as `./models/CelebA/dcgan/gen.pt`.
+And you can run
+
+* DCGAN
+```bash
+torchrun --nproc_per_node=1 run.py --model dcgan --batch_size 64 --mode test
+```
+
+* WGAN
+```bash
+torchrun --nproc_per_node=1 run.py --model wgan --batch_size 64 --mode test
+```
+
+* SAGAN
+```bash
+torchrun --nproc_per_node=1 run.py --model sagan --batch_size 64 --mode test
+```
+
 ## Experimental results
 You can enjoy the results in `./results`.
 

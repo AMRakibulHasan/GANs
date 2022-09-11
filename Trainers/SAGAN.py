@@ -41,18 +41,18 @@ class SAGAN(BaseTrainer):
                 # (1) update D
                 d_real_loss = self.dis(inputs)
 
-                # d_real_loss = F.relu(1 - d_real_loss).mean()    #  figine
-                real_label = torch.ones_like(d_real_loss).cuda()    # DCGAN
-                d_real_loss = self.cri(d_real_loss, real_label)     # DCGAN
+                d_real_loss = F.relu(1 - d_real_loss).mean()    #  figine
+                # real_label = torch.ones_like(d_real_loss).cuda()    # DCGAN
+                # d_real_loss = self.cri(d_real_loss, real_label)     # DCGAN
 
                 d_real_loss.backward()
                 noise_z = torch.randn((b, self.args.nz, 1, 1)).cuda()
                 fake_x = self.gen(noise_z)
                 d_fake_loss = self.dis(fake_x.detach())
 
-                # d_fake_loss = F.relu(1 + d_fake_loss)    # figine
-                fake_label = torch.zeros_like(d_fake_loss).cuda()     # DCGAN
-                d_fake_loss = self.cri(d_fake_loss, fake_label)       # DCGAN
+                d_fake_loss = F.relu(1 + d_fake_loss)    # figine
+                # fake_label = torch.zeros_like(d_fake_loss).cuda()     # DCGAN
+                # d_fake_loss = self.cri(d_fake_loss, fake_label)       # DCGAN
 
                 d_fake_loss.mean().backward()
                 self.dis_opt.step()
@@ -62,8 +62,8 @@ class SAGAN(BaseTrainer):
                 fake_x = self.gen(noise_z)
                 g_fake_loss = self.dis(fake_x)
 
-                # g_fake_loss = -g_fake_loss.mean()    # figine
-                g_fake_loss = self.cri(g_fake_loss, real_label)   # DCGAN
+                g_fake_loss = -g_fake_loss.mean()    # figine
+                # g_fake_loss = self.cri(g_fake_loss, real_label)   # DCGAN
 
                 g_fake_loss.backward()
                 self.gen_opt.step()

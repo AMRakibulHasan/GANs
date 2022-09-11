@@ -12,14 +12,19 @@ class BaseTrainer:
     def __init__(self, args):
         self.args = args
         if 'CelebA' in self.args.data_path:
-            self.model = 'CelebA'
+            self.dataset = 'CelebA'
         safe_create_dir('results')
-        safe_create_dir('results/CelebA')
-        safe_create_dir('results/CelebA/%s' % self.args.model)
-        safe_create_dir('results/CelebA/%s/Img' % self.args.model)
-        safe_create_dir('results/CelebA/%s/Img/fake/' % self.args.model)
-        safe_create_dir('results/CelebA/%s/Img/real/' % self.args.model)
-        self.save_path = 'results/CelebA/%s/' % self.args.model
+        safe_create_dir('results/%s' % self.dataset)
+        safe_create_dir('results/%s/%s' % (self.dataset, self.args.model))
+        safe_create_dir('results/%s/%s/Img' % (self.dataset, self.args.model))
+        safe_create_dir('results/%s/%s/Img/fake/' % (self.dataset, self.args.model))
+        safe_create_dir('results/%s/%s/Img/real/' % (self.dataset, self.args.model))
+
+        safe_create_dir('models')
+        safe_create_dir('models/%s' % self.dataset)
+        safe_create_dir('models/%s/%s' % (self.dataset, self.args.model))
+
+        self.save_path = 'results/%s/%s/' % (self.dataset, self.args.model)
         self.rank = torch.distributed.get_rank()
         self.start = time.time()
         self._init_data()
@@ -51,8 +56,9 @@ class BaseTrainer:
         self.dis.cuda()
 
     def load_model(self):
-        gen = torch.load(self.save_path + 'gen.pt')
-        dis = torch.load(self.save_path + 'dis.pt')
+        model_path = 'models/%s/%s' % (self.dataset, self.args.model)
+        gen = torch.load(model_path + 'gen.pt')
+        dis = torch.load(model_path + 'dis.pt')
         self.gen.load_state_dict(gen['net'])
         self.gen.cuda()
         self.gen_opt.load_state_dict(gen['opt'])
