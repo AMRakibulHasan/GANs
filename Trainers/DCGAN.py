@@ -10,7 +10,7 @@ class DCGAN(BaseTrainer):
     def __init__(self, args):
         super(DCGAN, self).__init__(args)
         if self.rank == 0:
-            print("训练dcgan...")
+            print("dcgan...")
 
     def _init_model(self):
         self.gen = Generator(self.args.nz, self.args.ngf)

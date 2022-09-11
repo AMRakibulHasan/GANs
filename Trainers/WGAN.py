@@ -10,7 +10,7 @@ class WGAN(BaseTrainer):
     def __init__(self, args):
         super(WGAN, self).__init__(args)
         if self.rank == 0:
-            print("训练wgan...")
+            print("wgan...")
 
     def _init_model(self):
         self.gen = Generator(self.args.nz, self.args.ngf)

@@ -11,7 +11,7 @@ class SAGAN(BaseTrainer):
     def __init__(self, args):
         super(SAGAN, self).__init__(args)
         if self.rank == 0:
-            print('training sagan...')
+            print('sagan...')
 
     def _init_model(self):
         self.gen = Generator(self.args.nz, self.args.ngf)

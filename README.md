@@ -41,6 +41,13 @@ The author proposes to use Self-Attention Generative Adversarial Network (SAGAN)
 * A dataset of 30,000 face，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
 
 ## Configuration Environment
+
+`imageio==2.9.0`,\
+`Pillow==9.2.0`, \
+`torch==1.11.0`, \
+`torchvision==0.12.0`
+
+You can configure the environment with the command
 ```
 conda create -n zh python=3.9
 conda activate zh
@@ -104,7 +111,7 @@ You can enjoy the results in `./results`.
 | Model |  Fid  | Time Cost |
 |:-----:|:-----:|:---------:|
 | DCGAN | 24.86 |   6h6m    |
-| WGAN  |       |           |
+| WGAN  | 18.55 |   5h56m   |
 | SAGAN | 25.63 |   7h46m   |
 
 **Notice:** *The above are the results of running 300 epochs in NVIDIA TITAN Xp (**1x**)*.
