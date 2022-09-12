@@ -4,6 +4,7 @@ from Trainers.baseTrainer import BaseTrainer
 from networks.DCGAN import Generator, Discriminator
 from utils import weights_init
 import time
+from losses import WassersteinLoss
 
 
 class WGAN(BaseTrainer):
@@ -26,10 +27,11 @@ class WGAN(BaseTrainer):
         # self.gen_opt = torch.optim.Adam(self.gen.parameters(), lr=self.args.lr)
         # self.dis_opt = torch.optim.Adam(self.dis.parameters(), lr=self.args.lr)
         # self.cri = nn.BCELoss()
+        self.cri = WassersteinLoss()
 
     def train(self):
         # Loss  maximize log(D(x)) + log(1-D(G(z)))
-        patten = "[%03d/%03d][%03d/%03d]  Loss_D: %.4f"
+        patten = "[%03d/%03d]  IS: %.4f   IS_std: %.4f   FID: %.4f"
         for epoch in range(self.args.epochs):
             self.sampler.set_epoch(epoch)
             cur_inputs = None
@@ -41,39 +43,33 @@ class WGAN(BaseTrainer):
                 b = inputs.shape[0]
                 # (1) Update D network
                 inputs = inputs.cuda()
-                # print(next(self.dis.parameters()).device)
                 real_s = self.dis(inputs)
-
-                # real_label = torch.ones_like(real_s).cuda()
-                # errD_real = self.cri(real_s, real_label)
-                # real_s.backward()
-                # D_x = real_s.mean().item()
                 noise = torch.randn((b, self.args.nz, 1, 1)).cuda()
                 fake_x = self.gen(noise)
+
                 (-real_s).mean().backward(retain_graph=True)
                 fake_s = self.dis(fake_x.detach())
+
+                # D_loss = self.cri(real_s, fake_s)
+                # D_loss.backward()
                 fake_s.mean().backward(retain_graph=True)
-                # real_s.mean().backward(retain_graph=True)
-                errD = (fake_s - real_s).mean()
-                # errD = (real_s - fake_s).mean()
-                # errD.backward(retain_graph=True)
+
                 self.dis_opt.step()
                 for param in self.dis.parameters():
                     torch.clip_(param.data, -self.args.c, self.args.c)
-                # fake_label = torch.zeros_like(fake_s).cuda()
-                # errD_fake = self.cri(fake_s, fake_label)
-                # errD_fake.backward()
+
 
 
                 # (2) Update G network
                 noise = torch.randn((b, self.args.nz, 1, 1)).cuda()
-                # print('real:', inputs.shape)
-                # print('noise:', noise.shape)
+
                 fake_x = self.gen(noise)
                 # print('fake_x:', fake_x.shape)
                 fake_s = self.dis(fake_x)
                 # errG = self.cri(fake_s, real_label)
-                (-1*fake_s).mean().backward()
+                G_loss = self.cri(fake_s)
+                # (-1*fake_s).mean().backward()
+                G_loss.backward()
                 self.gen_opt.step()
                 # for param in self.gen.parameters():
                 #     torch.clip_(param, -self.args.c, self.args.c)
@@ -81,22 +77,31 @@ class WGAN(BaseTrainer):
 
                 D_fake_x = fake_s.mean().item()
 
-                if batch % self.args.log_steps == 0:
-                    if self.rank == 0:
-                        print(patten % (
-                            epoch,
-                            self.args.epochs,
-                            batch,
-                            len(self.dl),
-                            errD.item()
-
-                        ))
+                # if batch % self.args.log_steps == 0:
+                #     if self.rank == 0:
+                #         print(patten % (
+                #             epoch,
+                #             self.args.epochs,
+                #             batch,
+                #             len(self.dl),
+                #             errD.item()
+                #
+                #         ))
 
             self.val(cur_inputs, epoch)
+            IS, IS_std, FID = self.evaluate()
+            print(patten % (
+                epoch,
+                self.args.epochs,
+                IS,
+                IS_std,
+                FID,
+            ))
             if epoch % 5 == 0:
                 self.save_model()
 
         end = time.time()
-        print('sum cost: %.4fs' % (end-self.start))
-
-
+        print('sum cost: %.4fs' % (end - self.start))
+        print()
+        print()
+        print()

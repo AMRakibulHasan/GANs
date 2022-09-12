@@ -4,6 +4,9 @@ import os
 from Trainers.DCGAN import DCGAN
 from Trainers.WGAN import WGAN
 from Trainers.SAGAN import SAGAN
+from Trainers.GNGAN import GNGAN
+from utils import create_evaluate_npz
+
 
 # os.environ['CUDA_VISIBLE_DEVICE'] = '0,1'
 
@@ -22,11 +25,19 @@ parse.add_argument('--log_steps', type=int, help="多少batch打印一次日志"
 
 parse.add_argument('--c', type=float, help="wgan的参数clip值", default=0.01)
 parse.add_argument('--mode', type=str, choices=['test', 'train'], default='train')
-parse.add_argument('--model', type=str, choices=['dcgan', 'wgan', 'sagan'], default='dcgan')
+parse.add_argument('--model', type=str, choices=['dcgan', 'wgan', 'sagan', 'gngan'], default='dcgan')
 parse.add_argument('--num_workers', type=int, help="dataloader的参数", default=4)
 parse.add_argument('--img_size', type=int, help="图片大小", default=64)
+parse.add_argument('--create_npz', action='store_true', help="Whether to create a dataset for evaluation?")
 
+# GNGAN
+parse.add_argument('--ndis', type=int, help="the number of discriminator updates per generator", default=5)
+parse.add_argument('--batch_size_D', type=int, help="batch size of Discriminator", default=64)
+parse.add_argument('--batch_size_G', type=int, help="batch size of Generator", default=128)
 args = parse.parse_args()
+
+if args.model == 'gngan':
+    args.batch_size = args.batch_size_D * args.ndis
 
 torch.distributed.init_process_group(backend='nccl', world_size=torch.cuda.device_count())
 rank = torch.distributed.get_rank()
@@ -40,7 +51,14 @@ if __name__ == "__main__":
         trainer = WGAN(args)
     elif args.model == 'sagan':
         trainer = SAGAN(args)
-    if args.mode == 'train':
+    elif args.model == 'gngan':
+        trainer = GNGAN(args)
+
+    if args.create_npz:
+        create_evaluate_npz(args)
+
+    elif args.mode == 'train':
         trainer.train()
-    if args.mode == 'test':
+
+    elif args.mode == 'test':
         trainer.test()

@@ -4,6 +4,8 @@ from Trainers.baseTrainer import BaseTrainer
 from networks.DCGAN import Generator, Discriminator
 from utils import weights_init
 import time
+from losses import BCELoss
+import torch.nn.functional as F
 
 
 class DCGAN(BaseTrainer):
@@ -23,11 +25,11 @@ class DCGAN(BaseTrainer):
         self.dis = nn.parallel.DistributedDataParallel(self.dis, device_ids=[self.rank], output_device=self.rank)
         self.gen_opt = torch.optim.Adam(self.gen.parameters(), lr=self.args.lr, betas=(self.args.beta1, 0.999))
         self.dis_opt = torch.optim.Adam(self.dis.parameters(), lr=self.args.lr, betas=(self.args.beta1, 0.999))
-        self.cri = nn.BCELoss()
+        self.cri = BCELoss()
 
     def train(self):
         # Loss  maximize log(D(x)) + log(1-D(G(z)))
-        patten = "[%02d/%02d][%02d/%02d]  Loss_D: %.4f  Loss_G: %.4f  D(x): %.4f  D(G(x)): %.4f"
+        patten = "[%03d/%03d]  IS: %.4f   IS_std: %.4f   FID: %.4f"
         for epoch in range(self.args.epochs):
             self.sampler.set_epoch(epoch)
             cur_inputs = None
@@ -38,17 +40,17 @@ class DCGAN(BaseTrainer):
                 b = inputs.shape[0]
                 # (1) Update D network
                 inputs = inputs.cuda()
-                # print(next(self.dis.parameters()).device)
                 real_s = self.dis(inputs)
                 real_label = torch.ones_like(real_s).cuda()
-                errD_real = self.cri(real_s, real_label)
+                errD_real = F.binary_cross_entropy(real_s, real_label)
                 errD_real.backward()
-                D_x = real_s.mean().item()
+                # D_x = real_s.mean().item()
                 noise = torch.randn((b, self.args.nz, 1, 1)).cuda()
                 fake_x = self.gen(noise)
                 fake_s = self.dis(fake_x.detach())
                 fake_label = torch.zeros_like(fake_s).cuda()
-                errD_fake = self.cri(fake_s, fake_label)
+                errD_fake = F.binary_cross_entropy(fake_s, fake_label)
+                # D_loss = self.cri(real_s, fake_s)
                 errD_fake.backward()
                 self.dis_opt.step()
 
@@ -59,30 +61,41 @@ class DCGAN(BaseTrainer):
                 fake_x = self.gen(noise)
                 # print('fake_x:', fake_x.shape)
                 fake_s = self.dis(fake_x)
-                errG = self.cri(fake_s, real_label)
-                errG.backward()
+                G_loss = self.cri(fake_s)
+                # errG = self.cri(fake_s, real_label)
+                G_loss.backward()
                 self.gen_opt.step()
 
-                D_fake_x = fake_s.mean().item()
 
-                if batch % self.args.log_steps == 0:
-                    if self.rank == 0:
-                        print(patten % (
-                            epoch,
-                            self.args.epochs,
-                            batch,
-                            len(self.dl),
-                            errD_fake.item() + errD_real.item(),
-                            errG.item(),
-                            D_x,
-                            D_fake_x,
-                        ))
+                # if batch % self.args.log_steps == 0:
+                #     if self.rank == 0:
+                #         print(patten % (
+                #             epoch,
+                #             self.args.epochs,
+                #             batch,
+                #             len(self.dl),
+                #             errD_fake.item() + errD_real.item(),
+                #             errG.item(),
+                #             D_x,
+                #             D_fake_x,
+                #         ))
 
             self.val(cur_inputs, epoch)
+            IS, IS_std, FID = self.evaluate()
+            print(patten % (
+                epoch,
+                self.args.epochs,
+                IS,
+                IS_std,
+                FID,
+            ))
             if epoch % 5 == 0:
                 self.save_model()
 
         end = time.time()
         print('sum cost: %.4fs' % (end-self.start))
+        print()
+        print()
+        print()
 
 

@@ -6,6 +6,21 @@ from tqdm import tqdm
 from torch.nn import Parameter
 import torch
 import torch.nn.functional as F
+from dataset.dataLoader import DL
+from torchvision.utils import save_image
+
+
+def normalize_gradient(Dis, x, *arg, **args):
+    b = x.shape[0]
+    x.requires_grad_(True)
+    f = Dis(x, *arg, **args)
+    grad = torch.autograd.grad(
+        f, [x], torch.ones_like(f), create_graph=True, retain_graph=True,
+    )[0]
+    grad_norm = torch.norm(grad.view(b, -1), p=2, dim=-1)
+    grad_norm = grad_norm.view(b, *[1 for _ in range(f.dim() - 1)])
+    f_hat = f / (grad_norm + torch.abs(f))
+    return f_hat
 
 
 class ConditionalBatchNorm2d(nn.BatchNorm2d):
@@ -126,6 +141,24 @@ def compose_gif(path):
     print("正在保存...")
     imageio.mimsave(os.path.join(path, 'train_epoch.gif'), gif_images, fps=3)
     print("保存成功...")
+
+
+def create_evaluate_npz(args):
+    data = DL(args)
+    dl = data.dl
+    dataset = None
+    if 'CelebA' in args.data_path:
+        dataset = 'CelebA'
+    num = 0
+    safe_create_dir('results/%s/%s/' % (dataset, 'val_img'))
+    print('extract img...')
+    for batch, inputs in enumerate(dl):
+
+        for img in tqdm(inputs, ncols=100):
+            save_image((img*0.5)+0.5, 'results/%s/%s/%s.png' % (dataset, 'val_img', num))
+            num += 1
+            if num >= 3000:
+                return
 
 
 if __name__ == "__main__":

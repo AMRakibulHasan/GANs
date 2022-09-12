@@ -5,12 +5,14 @@
 
 Run experiments with various GAN model
 
-## Model
+## Model (updating...)
 We compare the following models:
 * [x] [DCGAN](https://arxiv.org/abs/1511.06434)
 * [x] [WGAN](https://arxiv.org/abs/1701.07875)
+* [ ] [WGAN-gp](https://arxiv.org/abs/1704.00028)
 * [x] [SAGAN](https://arxiv.org/abs/1805.08318v2)
 * [ ] [TransGAN](https://arxiv.org/abs/2102.07074)
+* [ ] [GNGAN](https://arxiv.org/abs/2109.02235)
 
 ### [DCGAN](https://arxiv.org/abs/1511.06434)
 
@@ -39,6 +41,22 @@ The author proposes to use Self-Attention Generative Adversarial Network (SAGAN)
 
 ## Dataset
 * A dataset of 30,000 face，[CelebA](https://drive.google.com/drive/folders/1YRRaC3LWLHorVhFNJPzVqLrUlA10eLEJ)
+
+For example, download the dataset into ./MyData/cv/CelebA
+```
+./MyData/cv/
+├─CelebA
+    ├──image
+        ├── 0.jpg
+        ├── 1.jpg
+        ...
+        └── 29999.jpg
+```
+
+### Download pretrained `.npz` for envaluation
+
+In order to evaluate the FID metrics during training, you also need to put the pre-trained `.npz` files in `results/CelebA/`.\
+You can download the *Celeba_3k_64.npz* from [here](https://drive.google.com/drive/folders/14H2_6onRXyp8zEiJ7uibn7hls38EAo73?usp=sharing) to `./results/Celeba/Celeba_3k_64.npz`
 
 ## Configuration Environment
 

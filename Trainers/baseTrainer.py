@@ -6,6 +6,7 @@ from torchvision.utils import save_image
 import time
 import os
 from tqdm import tqdm
+from pytorch_gan_metrics import get_inception_score_and_fid
 
 
 class BaseTrainer:
@@ -91,6 +92,24 @@ class BaseTrainer:
         self.gen.train()
 
     @torch.no_grad()
+    def evaluate(self):
+
+        self.gen.eval()
+        imgs = []
+        for i in range(100):
+            noise = torch.randn((30, self.args.nz, 1, 1)).cuda()
+            fake_x = self.gen(noise)
+            imgs.append(fake_x)
+
+        imgs = torch.cat(imgs, dim=0)
+        (IS, IS_std), FID = get_inception_score_and_fid(imgs,
+                                                        'results/%s/%s_3k_%d.npz' %
+                                                        (self.dataset, self.dataset, self.args.img_size))
+        del imgs
+        self.gen.train()
+        return IS, IS_std, FID
+
+    @torch.no_grad()
     def test(self):
         self.load_model()
         self.gen.eval()
@@ -105,4 +124,3 @@ class BaseTrainer:
             fake_x = self.gen(noise_z)
             save_image((inputs[:64] * 0.5) + 0.5, os.path.join(real_path, '%s.png' % batch))
             save_image((fake_x[:64] * 0.5) + 0.5, os.path.join(fake_path, '%s.png' % batch))
-
