@@ -17,9 +17,9 @@ def normalize_gradient(Dis, x, *arg, **args):
     grad = torch.autograd.grad(
         f, [x], torch.ones_like(f), create_graph=True, retain_graph=True,
     )[0]
-    grad_norm = torch.norm(grad.view(b, -1), p=2, dim=-1)
-    grad_norm = grad_norm.view(b, *[1 for _ in range(f.dim() - 1)])
-    f_hat = f / (grad_norm + torch.abs(f))
+    grad_norm = torch.norm(torch.flatten(grad, start_dim=1), p=2, dim=1)
+    grad_norm = grad_norm.view(-1, *[1 for _ in range(len(f.shape) - 1)])
+    f_hat = (f / (grad_norm + torch.abs(f)))
     return f_hat
 
 

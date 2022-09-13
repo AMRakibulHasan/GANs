@@ -23,11 +23,14 @@ class HingeLoss(nn.Module):
         super(HingeLoss, self).__init__()
 
     def forward(self, real, fake=None):
-        loss = F.relu(1 - real).mean()
         if fake is not None:
-            loss = loss + F.relu(1 + fake).mean()
-
-        return loss
+            loss_real = F.relu(1 - real).mean()
+            loss_fake = F.relu(1 + fake).mean()
+            loss = loss_real + loss_fake
+            return loss
+        else:
+            loss = -real.mean()
+            return loss
 
 
 class WassersteinLoss(nn.Module):

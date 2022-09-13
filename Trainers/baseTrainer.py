@@ -99,6 +99,7 @@ class BaseTrainer:
         for i in range(100):
             noise = torch.randn((30, self.args.nz, 1, 1)).cuda()
             fake_x = self.gen(noise)
+            fake_x = (fake_x * 0.5) + 0.5
             imgs.append(fake_x)
 
         imgs = torch.cat(imgs, dim=0)
@@ -111,16 +112,17 @@ class BaseTrainer:
 
     @torch.no_grad()
     def test(self):
-        self.load_model()
-        self.gen.eval()
-        safe_create_dir(os.path.join(self.save_path, 'Img', 'test_fake'))
-        safe_create_dir(os.path.join(self.save_path, 'Img', 'test_real'))
-        fake_path = os.path.join(self.save_path, 'Img', 'test_fake')
-        real_path = os.path.join(self.save_path, 'Img', 'test_real')
-        for batch, inputs in enumerate(tqdm(self.dl, ncols=100), 0):
-            b = inputs.shape[0]
-            inputs = inputs.cuda()
-            noise_z = torch.randn((b, self.args.nz, 1, 1)).cuda()
-            fake_x = self.gen(noise_z)
-            save_image((inputs[:64] * 0.5) + 0.5, os.path.join(real_path, '%s.png' % batch))
-            save_image((fake_x[:64] * 0.5) + 0.5, os.path.join(fake_path, '%s.png' % batch))
+        if self.rank == 0:
+            self.load_model()
+            self.gen.eval()
+            safe_create_dir(os.path.join(self.save_path, 'Img', 'test_fake'))
+            safe_create_dir(os.path.join(self.save_path, 'Img', 'test_real'))
+            fake_path = os.path.join(self.save_path, 'Img', 'test_fake')
+            real_path = os.path.join(self.save_path, 'Img', 'test_real')
+            for batch, inputs in enumerate(tqdm(self.dl, ncols=100), 0):
+                b = inputs.shape[0]
+                inputs = inputs.cuda()
+                noise_z = torch.randn((b, self.args.nz, 1, 1)).cuda()
+                fake_x = self.gen(noise_z)
+                save_image((inputs[:64] * 0.5) + 0.5, os.path.join(real_path, '%s.png' % batch))
+                save_image((fake_x[:64] * 0.5) + 0.5, os.path.join(fake_path, '%s.png' % batch))

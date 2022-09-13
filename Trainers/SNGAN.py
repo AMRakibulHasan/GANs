@@ -8,11 +8,11 @@ import torch.nn.functional as F
 from losses import HingeLoss
 
 
-class SAGAN(BaseTrainer):
+class SNGAN(BaseTrainer):
     def __init__(self, args):
-        super(SAGAN, self).__init__(args)
+        super(SNGAN, self).__init__(args)
         if self.rank == 0:
-            print('sagan...')
+            print('sngan...')
 
     def _init_model(self):
         self.gen = Generator(self.args.nz, self.args.ngf)
@@ -22,15 +22,16 @@ class SAGAN(BaseTrainer):
         self.dis = nn.SyncBatchNorm.convert_sync_batchnorm(self.dis).cuda()
         # self.gen.apply(weights_init)
         # self.dis.apply(weights_init)
-        self.gen_opt = torch.optim.Adam(filter(lambda p: p.requires_grad, self.gen.parameters()), 1e-4,
+        self.gen_opt = torch.optim.Adam(filter(lambda p: p.requires_grad, self.gen.parameters()),
+                                        lr=self.args.lr,
                                         betas=(0.0, 0.9))
-        self.dis_opt = torch.optim.Adam(filter(lambda p: p.requires_grad, self.dis.parameters()), 4e-4,
+        self.dis_opt = torch.optim.Adam(filter(lambda p: p.requires_grad, self.dis.parameters()),
+                                        lr=self.args.lr,
                                         betas=(0.0, 0.9))
         self.cri = HingeLoss()
 
     def train(self):
         patten = "[%03d/%03d]  IS: %.4f   IS_std: %.4f   FID: %.4f"
-
         for epoch in range(self.args.epochs):
             cur_inputs = None
             self.sampler.set_epoch(epoch)
@@ -71,17 +72,6 @@ class SAGAN(BaseTrainer):
 
                 G_loss.backward()
                 self.gen_opt.step()
-                # for param in self.dis.parameters():
-                #     torch.clip_(param.data, -self.args.c, self.args.c)
-                # if batch % self.args.log_steps == 0:
-                #     if self.rank == 0:
-                #         print(patten % (
-                #             epoch,
-                #             self.args.epochs,
-                #             batch,
-                #             len(self.dl),
-                #             (d_fake_loss - d_real_loss).mean().item()
-                #         ))
 
             self.val(cur_inputs, epoch)
             IS, IS_std, FID = self.evaluate()

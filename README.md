@@ -7,12 +7,13 @@ Run experiments with various GAN model
 
 ## Model (updating...)
 We compare the following models:
-* [x] [DCGAN](https://arxiv.org/abs/1511.06434)
-* [x] [WGAN](https://arxiv.org/abs/1701.07875)
-* [ ] [WGAN-gp](https://arxiv.org/abs/1704.00028)
-* [x] [SAGAN](https://arxiv.org/abs/1805.08318v2)
-* [ ] [TransGAN](https://arxiv.org/abs/2102.07074)
-* [ ] [GNGAN](https://arxiv.org/abs/2109.02235)
+* [x] [DCGAN](https://arxiv.org/abs/1511.06434)(2015.11)
+* [x] [WGAN](https://arxiv.org/abs/1701.07875)(2017.01)
+* [ ] [WGAN-gp](https://arxiv.org/abs/1704.00028)(2017.04)
+* [ ] [SNGAN](https://arxiv.org/abs/1802.05957)(2018.02)
+* [x] [SAGAN](https://arxiv.org/abs/1805.08318v2)(2018.05)
+* [ ] [TransGAN](https://arxiv.org/abs/2102.07074)(2021.02)
+* [ ] [GNGAN](https://arxiv.org/abs/2109.02235)(2021.09)
 
 ### [DCGAN](https://arxiv.org/abs/1511.06434)
 
@@ -147,7 +148,7 @@ You can enjoy the results in `./results`.
 ### Evaluate
 | Model |  Fid  | Time Cost |
 |:-----:|:-----:|:---------:|
-| DCGAN | 24.86 |   6h6m    |
+| DCGAN | 25.86 |   6h6m    |
 | WGAN  | 18.55 |   5h56m   |
 | SAGAN | 25.63 |   7h46m   |
 

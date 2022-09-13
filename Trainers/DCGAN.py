@@ -82,20 +82,22 @@ class DCGAN(BaseTrainer):
 
             self.val(cur_inputs, epoch)
             IS, IS_std, FID = self.evaluate()
-            print(patten % (
-                epoch,
-                self.args.epochs,
-                IS,
-                IS_std,
-                FID,
-            ))
+            if self.rank == 0:
+                print(patten % (
+                    epoch,
+                    self.args.epochs,
+                    IS,
+                    IS_std,
+                    FID,
+                ))
             if epoch % 5 == 0:
                 self.save_model()
 
         end = time.time()
-        print('sum cost: %.4fs' % (end-self.start))
-        print()
-        print()
-        print()
+        if self.rank == 0:
+            print('sum cost: %.4fs' % (end-self.start))
+            print()
+            print()
+            print()
 
 

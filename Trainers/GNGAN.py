@@ -54,7 +54,8 @@ class GNGAN(BaseTrainer):
                     D_loss.backward()
 
                     self.dis_opt.step()
-
+                    # for param in self.dis.parameters():
+                    #     torch.clip_(param.data, -self.args.c, self.args.c)
 
                 # (2) Update G
                 self.gen_opt.zero_grad()
@@ -76,18 +77,20 @@ class GNGAN(BaseTrainer):
 
             self.val(cur_inputs, epoch)
             IS, IS_std, FID = self.evaluate()
-            print(patten % (
-                epoch,
-                self.args.epochs,
-                IS,
-                IS_std,
-                FID,
-            ))
+            if self.rank == 0:
+                print(patten % (
+                    epoch,
+                    self.args.epochs,
+                    IS,
+                    IS_std,
+                    FID,
+                ))
             if epoch % 5 == 0:
                 self.save_model()
 
         end = time.time()
-        print('sum cost: %.4fs' % (end - self.start))
-        print()
-        print()
-        print()
+        if self.rank == 0:
+            print('sum cost: %.4fs' % (end - self.start))
+            print()
+            print()
+            print()
